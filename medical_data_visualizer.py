@@ -16,26 +16,34 @@ df['gluc'] = (df['gluc'] > 1).astype(int)
 
 # 4. Draw the Categorical Plot
 def draw_cat_plot():
-    # 5. Create DataFrame for cat plot using pd.melt
-    df_cat = pd.melt(df, 
-                     id_vars=['cardio'], 
-                     value_vars=['cholesterol', 'gluc', 'smoke', 'alco', 'active', 'overweight'])
+    # Melt the DataFrame to long format with the correct order
+    df_cat = pd.melt(
+        df,
+        id_vars=['cardio'],
+        value_vars=['active', 'alco', 'cholesterol', 'gluc', 'overweight', 'smoke']
+    )
 
-    # 6. Group and reformat the data
-    df_cat = df_cat.value_counts().reset_index(name='total')
-    df_cat.rename(columns={0:'total'}, inplace=True)  # ensure column is named total
-    # Actually value_counts already gives 'total', we have it correct
+    # Draw the catplot using seaborn countplot
+    g = sns.catplot(
+        x='variable',
+        hue='value',
+        col='cardio',
+        data=df_cat,
+        kind='count',
+        order=['active', 'alco', 'cholesterol', 'gluc', 'overweight', 'smoke'],
+        hue_order=[0,1]
+    )
 
-    # 7. Draw the catplot using seaborn
-    fig = sns.catplot(x='variable', y='total', hue='value', col='cardio', 
-                      data=df_cat, kind='bar').fig
+    # Set y-axis label to 'total' for all subplots
+    g.set_axis_labels("variable", "total")
 
-    # 8. Get the figure for output
-    # Already stored in fig
+    # Get the figure
+    fig = g.fig
 
-    # 9. Save the figure
+    # Save the figure
     fig.savefig('catplot.png')
     return fig
+
 
 # 10. Draw the Heat Map
 def draw_heat_map():
